@@ -69,7 +69,7 @@ export class MeetupToTagService {
     return this.meetupToTagRepository.save(meetupToTag);
   }
 
-  public async deleteTagFromMeetup(id: number): Promise<void> {
+  public async delete(id: number): Promise<void> {
     await this.meetupToTagRepository.softDelete(id);
   }
 }
