@@ -1,7 +1,7 @@
 import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, UseGuards } from '@nestjs/common';
 import { MeetupToTag } from '../entities/meetup-to-tag.entity';
-import { MeetupService } from 'src/services/meetup.service';
-import { TagService } from 'src/services/tag.service';
+import { MeetupService } from '../services/meetup.service';
+import { TagService } from '../services/tag.service';
 import { MeetupToTagService } from '../services/meetup-to-tag.service';
 import { CreateMeetupToTagDto, UpdateMeetupToTagDto } from '../dto/meetup-to-tag.dto';
 
