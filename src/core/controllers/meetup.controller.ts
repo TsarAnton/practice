@@ -26,10 +26,11 @@ export class MeetupController {
   async createAction(@Body() meetup: CreateMeetupDto): Promise<Meetup>{
     const newMeetup = new Meetup();
     newMeetup.name = meetup.name;
-    newMeetup.description = meetup.description;
+    newMeetup.discription = meetup.discription;
     newMeetup.place = meetup.place;
     newMeetup.time = meetup.time;
-    return this.MeetupService.create(newMeetup);
+    console.log(newMeetup)
+    return this.MeetupService.create(newMeetup.dataValues);
   }
 
   @Put(':id')
@@ -39,10 +40,10 @@ export class MeetupController {
         throw new NotFoundException(`Meetup with id=${id} does not exist`);
       }
       existingMeetup.name = meetup.name;
-      existingMeetup.description = meetup.description;
+      existingMeetup.discription = meetup.discription;
       existingMeetup.place = meetup.place;
       existingMeetup.time = meetup.time;
-      return this.MeetupService.update(existingMeetup);
+      return this.MeetupService.update(existingMeetup.dataValues);
   }
 
   @Delete(':id')
