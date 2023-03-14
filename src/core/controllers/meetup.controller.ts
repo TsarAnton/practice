@@ -29,6 +29,7 @@ export class MeetupController {
     newMeetup.description = meetup.description;
     newMeetup.place = meetup.place;
     newMeetup.time = meetup.time;
+    console.log(newMeetup)
     return this.MeetupService.create(newMeetup);
   }
 

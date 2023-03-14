@@ -54,11 +54,44 @@ export class MeetupToTagService {
   }
 
   public async readAll(): Promise<MeetupToTag[]> {
-    return this.meetupToTagRepository.find();
+    const queryBuilder = this.meetupToTagRepository.createQueryBuilder();
+
+    return queryBuilder
+      .select(['meetupToTag.id'])
+      .from(MeetupToTag, 'meetupToTag')
+      .leftJoin('meetupToTag.meetup', 'meetup')
+      .leftJoin('meetupToTag.tag', 'tag')
+      .addSelect([
+        'meetup.id',
+        'meetup.name',
+        'meetup.description',
+        'meetup.time',
+        'meetup.place',
+        'tag.id',
+        'tag.name'
+      ])
+      .getMany();
   }
 
   public async readById(id: number): Promise<MeetupToTag> {
-    return this.meetupToTagRepository.findOneBy({ id });
+    const queryBuilder = this.meetupToTagRepository.createQueryBuilder();
+
+    return queryBuilder
+      .select(['meetupToTag.id'])
+      .from(MeetupToTag, 'meetupToTag')
+      .leftJoin('meetupToTag.meetup', 'meetup')
+      .leftJoin('meetupToTag.tag', 'tag')
+      .addSelect([
+        'meetup.id',
+        'meetup.name',
+        'meetup.description',
+        'meetup.time',
+        'meetup.place',
+        'tag.id',
+        'tag.name'
+      ])
+      .where('meetupToTag.id = :id', { id: id})
+      .getOne();
   }
 
   public async create(meetupToTag: MeetupToTag): Promise<MeetupToTag> {
