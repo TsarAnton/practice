@@ -26,7 +26,7 @@ export class MeetupController {
   async createAction(@Body() meetup: CreateMeetupDto): Promise<Meetup>{
     const newMeetup = new Meetup();
     newMeetup.name = meetup.name;
-    newMeetup.discription = meetup.discription;
+    newMeetup.description = meetup.description;
     newMeetup.place = meetup.place;
     newMeetup.time = meetup.time;
     console.log(newMeetup)
@@ -40,7 +40,7 @@ export class MeetupController {
         throw new NotFoundException(`Meetup with id=${id} does not exist`);
       }
       existingMeetup.name = meetup.name;
-      existingMeetup.discription = meetup.discription;
+      existingMeetup.description = meetup.description;
       existingMeetup.place = meetup.place;
       existingMeetup.time = meetup.time;
       return this.MeetupService.update(existingMeetup.dataValues);

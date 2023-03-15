@@ -27,7 +27,7 @@ export class Meetup extends Model<Meetup> {
 		type: DataType.STRING,
 		allowNull: false,
 	})
-	discription: string;
+	description: string;
 
     @Column({
 		type: DataType.DATE,
