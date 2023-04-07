@@ -1,19 +1,28 @@
-import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, HttpStatus, HttpCode } from '@nestjs/common';
 import { Tag } from '../entities/tag.entity';
 import { TagService } from '../services/tag.service';
 import { CreateTagDto, UpdateTagDto } from '../dto/tag.dto';
+import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('Tags')
 @Controller('tags')
 export class TagController {
   constructor(private readonly TagService: TagService){
   }
 
   @Get()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Returns all tags" })
+  @ApiResponse({ status: HttpStatus.OK, description: "Success" })
   getAllAction(): Promise<Tag[]> {
     return this.TagService.readAll();
   }
 
   @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Returns a tag with specified id" })
+  @ApiResponse({ status: HttpStatus.OK, description: "Success", type: Tag })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Not Found" })
   async getOneAction(@Param('id') id: number): Promise<Tag> {
     const tag = await this.TagService.readById(id);
     if( tag === null ){
@@ -23,24 +32,41 @@ export class TagController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Creates a new tag" })
+  @ApiResponse({ status: HttpStatus.OK, description: "Success", type: Tag })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Bad Request" })
   async createAction(@Body() tag: CreateTagDto): Promise<Tag>{
-    const newTag = new Tag();
-    newTag.name = tag.name;
-    return this.TagService.create(newTag);
+    return this.TagService.create(tag);
   }
 
   @Put(':id')
-  async updateAction(@Param('id') id: number, @Body() tag: UpdateTagDto): Promise<Tag> {
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Updates a tag with specified id' })
+  @ApiResponse({ status: HttpStatus.OK, description: "Success", type: Tag })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Not Found" })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Bad Request" })
+  async updateAction(
+    @Param('id') id: number, 
+    @Body() tag: UpdateTagDto
+  ): Promise<Tag> {
       const existingTag = await this.TagService.readById(id);
       if(existingTag === null){
         throw new NotFoundException(`Tag with id=${id} does not exist`);
       }
-      existingTag.name = tag.name;
-      return this.TagService.update(existingTag);
+      return this.TagService.update(id, tag);
   }
 
   @Delete(':id')
-  deleteAction(@Param('id') id: number): Promise<void>{
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Deletes a tag with specified id" })
+  @ApiResponse({ status: HttpStatus.OK, description: "Success" })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Not Found" })
+  async deleteAction(@Param('id') id: number): Promise<void>{
+    const existingTag = await this.TagService.readById(id);
+    if(existingTag === null){
+      throw new NotFoundException(`Tag with id=${id} does not exist`);
+    }
     return this.TagService.delete(id);
   }
 }

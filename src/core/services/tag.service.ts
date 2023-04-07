@@ -1,5 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Tag } from '../entities/tag.entity';
+import { CreateTagDto } from '../dto/tag.dto';
+import { UpdateTagDto } from '../dto/tag.dto';
 
 @Injectable()
 export class TagService {
@@ -9,21 +11,30 @@ export class TagService {
   ) {}
 
   public async readAll(): Promise<Tag[]> {
-    return this.tagRepository.findAll();
+    return await this.tagRepository.findAll();
   }
 
   public async readById(id: number): Promise<Tag> {
-    return this.tagRepository.findOne({
+    return await this.tagRepository.findOne({
       where: { id } 
     });
   }
 
-  public async create(tag: Tag): Promise<Tag> {
-     return this.tagRepository.create(tag);
+  public async create(tag: CreateTagDto): Promise<Tag> {
+    return await this.tagRepository.create(tag);
   }
 
-  public async update(tag: Tag): Promise<Tag> {
-    return this.tagRepository.create(tag);
+  public async update(
+    id: number,
+    tag: UpdateTagDto,
+  ): Promise<Tag> {
+    return [... await this.tagRepository.update(
+			tag,
+			{
+				where: { id },
+				returning: true,
+			}
+		)][1][0];
   }
 
   public async delete(id: number): Promise<void> {
