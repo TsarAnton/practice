@@ -1,21 +1,34 @@
-import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, BadRequestException, HttpStatus, HttpCode } from '@nestjs/common';
 import { Meetup } from '../entities/meetup.entity';
 import { MeetupService } from '../services/meetup.service';
 import { CreateMeetupDto, UpdateMeetupDto } from '../dto/meetup.dto';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { TagService } from '../services/tag.service';
 
+@ApiTags('Meetups')
 @Controller('meetups')
 export class MeetupController {
-  constructor(private readonly MeetupService: MeetupService){
+  constructor(
+    private readonly meetupService: MeetupService,
+    private readonly tagService: TagService,
+    ){
   }
 
   @Get()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Returns all meetups" })
+  @ApiResponse({ status: HttpStatus.OK, description: "Success" })
   getAllAction(): Promise<Meetup[]> {
-    return this.MeetupService.readAll();
+    return this.meetupService.readAll();
   }
 
   @Get(':id')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Returns a meetup with specified id" })
+  @ApiResponse({ status: HttpStatus.OK, description: "Success", type: Meetup })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Not Found" })
   async getOneAction(@Param('id') id: number): Promise<Meetup> {
-    const meetup = await this.MeetupService.readById(id);
+    const meetup = await this.meetupService.readById(id);
     if( meetup === null ){
       throw new NotFoundException(`Meetup with id=${id} does not exist`);
     }
@@ -23,31 +36,66 @@ export class MeetupController {
   }
 
   @Post()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Creates a new meetup" })
+  @ApiResponse({ status: HttpStatus.OK, description: "Success", type: Meetup })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Bad Request" })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Not Found" })
   async createAction(@Body() meetup: CreateMeetupDto): Promise<Meetup>{
-    const newMeetup = new Meetup();
-    newMeetup.name = meetup.name;
-    newMeetup.description = meetup.description;
-    newMeetup.place = meetup.place;
-    newMeetup.time = meetup.time;
-    console.log(newMeetup)
-    return this.MeetupService.create(newMeetup.dataValues);
+    let set = new Set();
+    for(let tag of meetup.tags) {
+      if(set.has(tag)) {
+        throw new BadRequestException(`Tag with id=${tag} appers 2 times`);
+      } else {
+        set.add(tag);
+      }
+      const existingTag = await this.tagService.readById(tag);
+      if(existingTag === null) {
+        throw new NotFoundException(`Tag with id=${tag} does not exist`);
+      }
+    }
+    return this.meetupService.create(meetup);
   }
 
   @Put(':id')
-  async updateAction(@Param('id') id: number, @Body() meetup: UpdateMeetupDto): Promise<Meetup> {
-      const existingMeetup = await this.MeetupService.readById(id);
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Updates a meetup with specified id" })
+  @ApiResponse({ status: HttpStatus.OK, description: "Success", type: Meetup })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Not Found" })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Bad Request" })
+  async updateAction(
+    @Param('id') id: number, 
+    @Body() meetup: UpdateMeetupDto
+  ): Promise<Meetup> {
+      const existingMeetup = await this.meetupService.readById(id);
       if(existingMeetup === null){
         throw new NotFoundException(`Meetup with id=${id} does not exist`);
       }
-      existingMeetup.name = meetup.name;
-      existingMeetup.description = meetup.description;
-      existingMeetup.place = meetup.place;
-      existingMeetup.time = meetup.time;
-      return this.MeetupService.update(existingMeetup.dataValues);
+      let set = new Set();
+      let existingTags = new Set(existingMeetup.dataValues.tags.map(tag => tag.id));
+      for(let tag of meetup.tags) {
+        if(set.has(tag)) {
+          throw new BadRequestException(`Tag with id=${tag} appers 2 times`);
+        } else {
+          set.add(tag);
+        }
+        if(existingTags.has(tag)) {
+          throw new BadRequestException(`Meetup already has tag with id=${tag}`);
+        }
+      }
+      return this.meetupService.update(id, meetup);
   }
 
   @Delete(':id')
-  deleteAction(@Param('id') id: number): Promise<void>{
-    return this.MeetupService.delete(id);
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: "Deletes a meetup with specified id" })
+  @ApiResponse({ status: HttpStatus.OK, description: "Success" })
+  @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Not Found" })
+  async deleteAction(@Param('id') id: number): Promise<void>{
+    const existingMeetup = await this.meetupService.readById(id);
+    if(existingMeetup === null){
+      throw new NotFoundException(`Meetup with id=${id} does not exist`);
+    }
+    return this.meetupService.delete(id);
   }
 }
