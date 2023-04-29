@@ -1,18 +1,21 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { User } from '../entities/user.entity';
+import { CreateUserDto } from '../dto/user.dto';
+import { UpdateUserDto } from '../dto/user.dto';
+import { ReadUserDto } from '../dto/user.dto';
 import { Role } from '../entities/role.entity';
+import { RoleService } from './role.service';
 
 @Injectable()
 export class UserService {
   constructor(
-    @Inject("MEETUPS_REPOSITORY")
+    @Inject("USERS_REPOSITORY")
     private userRepository: typeof User,
-    @Inject("TAGS_REPOSITORY")
-    private roleRepository: typeof Role,
+    private roleService: RoleService,
   ) {}
 
   public async readAll(): Promise<User[]> {
-    return this.userRepository.findAll({
+    return await this.userRepository.findAll({
       include: [
         {
           model: Role,
@@ -22,27 +25,73 @@ export class UserService {
     });
   }
 
-  // public async readBy(filter: ReadUserDto): Promise<User[]> {
-  //   return this.userRepository.findAll({
-  //     where: { ...filter },
-  //   });
-  // }
-
-  public async readById(id: number): Promise<User> {
-    return this.userRepository.findOne({
-      where: { id },
+  public async readBy(options: ReadUserDto): Promise<User> {
+    return await this.userRepository.findOne({
+      where: { ...options },
+      include: [
+        {
+          model: Role,
+          all: true,
+        }
+      ],
     });
   }
 
-  public async create(user: User): Promise<User> {
-     return this.userRepository.create(user);
+  public async readById(id: number): Promise<User> {
+    return await this.userRepository.findOne({
+      where: { id },
+      include: [
+        {
+          model: Role,
+          all: true,
+        }
+      ]
+    });
   }
 
-  public async update(user: User): Promise<User> {
-    return this.userRepository.create(user);
+  public async create(user: CreateUserDto): Promise<User> {
+    let newUser = new User();
+    for(let prop in user) {
+      newUser[prop] = user[prop];
+    }
+		let createdUser = await this.userRepository.create(newUser.dataValues);
+
+		for await (const role of user.roles) {
+			await createdUser.$add('roles', await this.roleService.readById(role));
+		}
+
+		return await this.readById(createdUser.id);
+  }
+
+  public async update(
+    id: number,
+    user: UpdateUserDto
+  ): Promise<User> {
+    let existingUser = await this.readById(id);
+    let update = {
+      login: user.login !== undefined ? user.login : existingUser.login,
+      password: user.password !== undefined ? user.password : existingUser.password,
+    }
+		let createdUser = [... await this.userRepository.update(
+      update,
+      {
+        where: { id },
+        returning: true,
+      }
+    )][1][0];
+    console.log(user.roles)
+    if(user.roles !== undefined) {
+		  for await (const role of user.roles) {
+			  await createdUser.$add('roles', await this.roleService.readById(role));
+		  }
+    }
+
+		return await this.readById(createdUser.id);
   }
 
   public async delete(id: number): Promise<void> {
+    let existingUser = await this.readById(id);
+    existingUser.$remove('roles', existingUser.dataValues.roles)
     await this.userRepository.destroy({
       where: { id },
     });

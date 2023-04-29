@@ -1,6 +1,6 @@
 import { Role } from "../entities/role.entity";
 
-export const meetupsProviders = [
+export const rolesProviders = [
   {
     provide: 'ROLES_REPOSITORY',
     useValue: Role,

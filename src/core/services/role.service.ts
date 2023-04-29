@@ -1,30 +1,40 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { Role } from '../entities/role.entity';
 import { CreateRoleDto } from '../dto/role.dto';
+import { UpdateRoleDto } from '../dto/role.dto';
 
 @Injectable()
 export class RoleService {
   constructor(
-    @Inject("TAGS_REPOSITORY")
+    @Inject("ROLES_REPOSITORY")
     private roleRepository: typeof Role,
   ) {}
 
   public async readAll(): Promise<Role[]> {
-    return this.roleRepository.findAll();
+    return await this.roleRepository.findAll();
   }
 
   public async readById(id: number): Promise<Role> {
-    return this.roleRepository.findOne({
+    return await this.roleRepository.findOne({
       where: { id } 
     });
   }
 
   public async create(role: CreateRoleDto): Promise<Role> {
-     return this.roleRepository.create(role);
+    return await this.roleRepository.create(role);
   }
 
-  public async update(role: CreateRoleDto): Promise<Role> {
-    return this.roleRepository.create(role);
+  public async update(
+    id: number,
+    role: UpdateRoleDto,
+  ): Promise<Role> {
+    return [... await this.roleRepository.update(
+			role,
+			{
+				where: { id },
+				returning: true,
+			}
+		)][1][0];
   }
 
   public async delete(id: number): Promise<void> {

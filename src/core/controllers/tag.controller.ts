@@ -1,9 +1,11 @@
-import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, HttpStatus, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, HttpStatus, HttpCode, UseGuards } from '@nestjs/common';
 import { Tag } from '../entities/tag.entity';
 import { TagService } from '../services/tag.service';
 import { CreateTagDto, UpdateTagDto } from '../dto/tag.dto';
 import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
+//@UseGuards(AuthGuard("jwt"))
 @ApiTags('Tags')
 @Controller('tags')
 export class TagController {
@@ -14,6 +16,7 @@ export class TagController {
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: "Returns all tags" })
   @ApiResponse({ status: HttpStatus.OK, description: "Success" })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
   getAllAction(): Promise<Tag[]> {
     return this.TagService.readAll();
   }
@@ -23,6 +26,7 @@ export class TagController {
   @ApiOperation({ summary: "Returns a tag with specified id" })
   @ApiResponse({ status: HttpStatus.OK, description: "Success", type: Tag })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Not Found" })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
   async getOneAction(@Param('id') id: number): Promise<Tag> {
     const tag = await this.TagService.readById(id);
     if( tag === null ){
@@ -36,6 +40,7 @@ export class TagController {
   @ApiOperation({ summary: "Creates a new tag" })
   @ApiResponse({ status: HttpStatus.OK, description: "Success", type: Tag })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Bad Request" })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
   async createAction(@Body() tag: CreateTagDto): Promise<Tag>{
     return this.TagService.create(tag);
   }
@@ -46,6 +51,7 @@ export class TagController {
   @ApiResponse({ status: HttpStatus.OK, description: "Success", type: Tag })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Not Found" })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Bad Request" })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
   async updateAction(
     @Param('id') id: number, 
     @Body() tag: UpdateTagDto
@@ -62,6 +68,7 @@ export class TagController {
   @ApiOperation({ summary: "Deletes a tag with specified id" })
   @ApiResponse({ status: HttpStatus.OK, description: "Success" })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Not Found" })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
   async deleteAction(@Param('id') id: number): Promise<void>{
     const existingTag = await this.TagService.readById(id);
     if(existingTag === null){

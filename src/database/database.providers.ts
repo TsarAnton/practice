@@ -1,7 +1,9 @@
 
 import { Sequelize } from 'sequelize-typescript';
 import { Meetup } from 'src/core/entities/meetup.entity';
+import { Role } from 'src/core/entities/role.entity';
 import { Tag } from 'src/core/entities/tag.entity';
+import { User } from 'src/core/entities/user.entity';
 
 export const databaseProviders = [
   {
@@ -15,7 +17,7 @@ export const databaseProviders = [
         password: '2003',
         database: 'practice_db',
       });
-      sequelize.addModels([Meetup, Tag]);
+      sequelize.addModels([Meetup, Tag, User, Role]);
       await sequelize.sync();
       return sequelize;
     },

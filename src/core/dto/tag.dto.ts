@@ -7,7 +7,7 @@ import {
 } from 'class-validator';
 
 export class CreateTagDto {
-	@ApiProperty({ description: "Tag title", nullable: false })
+	@ApiProperty({ description: "Tag name", nullable: false })
     @IsNotEmpty()
 	@MaxLength(100)
 	@IsString()
@@ -15,7 +15,7 @@ export class CreateTagDto {
 }
 
 export class UpdateTagDto {
-	@ApiProperty({ description: "Tag title", nullable: true })
+	@ApiProperty({ description: "Tag name", nullable: true })
     @IsOptional()
 	@MaxLength(100)
 	@IsString()

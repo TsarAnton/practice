@@ -1,3 +1,4 @@
+import { ApiProperty } from '@nestjs/swagger';
 import {
 	IsArray,
 	IsDate,
@@ -9,36 +10,58 @@ import {
     IsOptional,
 } from 'class-validator';
 
-export class CreateMeetupDto {
+export class CreateUserDto {
+	@ApiProperty({ description: "User login", nullable: false })
     @IsNotEmpty()
 	@MaxLength(100)
 	@IsString()
     login: string;
 
+	@ApiProperty({ description: "User password", nullable: false })
     @IsNotEmpty()
 	@MaxLength(255)
 	@IsString()
     password: string;
 
+	@ApiProperty({ description: "User roles", nullable: false })
+	@IsNotEmpty()
     @IsDefined()
 	@IsArray()
 	@IsInt({ each: true })
-    roleIds: number[];
+    roles: number[];
 }
 
-export class UpdateMeetupDto {
-    @IsNotEmpty()
+export class UpdateUserDto {
+	@ApiProperty({ description: "User login", nullable: true })
+    @IsOptional()
 	@MaxLength(100)
 	@IsString()
-    login: string;
+    login?: string;
 
-    @IsNotEmpty()
+	@ApiProperty({ description: "User password", nullable: true })
+    @IsOptional()
 	@MaxLength(100)
 	@IsString()
-    password: string;
+    password?: string;
 
-    @IsDefined()
+	@ApiProperty({ description: "User roles", nullable: true })
+    @IsOptional()
+	@IsDefined()
 	@IsArray()
 	@IsInt({ each: true })
-    roleIds: number[];
+    roles?: number[];
+}
+
+export class ReadUserDto {
+	@ApiProperty({ description: "User login", nullable: true })
+    @IsOptional()
+	@MaxLength(100)
+	@IsString()
+    login?: string;
+
+	@ApiProperty({ description: "User password", nullable: true })
+    @IsOptional()
+	@MaxLength(100)
+	@IsString()
+    password?: string;
 }

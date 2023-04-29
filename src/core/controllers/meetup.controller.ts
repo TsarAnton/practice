@@ -1,11 +1,13 @@
-import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, BadRequestException, HttpStatus, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, BadRequestException, HttpStatus, HttpCode, UseGuards } from '@nestjs/common';
 import { Meetup } from '../entities/meetup.entity';
 import { MeetupService } from '../services/meetup.service';
 import { CreateMeetupDto, UpdateMeetupDto } from '../dto/meetup.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TagService } from '../services/tag.service';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags('Meetups')
+@UseGuards(AuthGuard("jwt"))
 @Controller('meetups')
 export class MeetupController {
   constructor(
@@ -15,9 +17,11 @@ export class MeetupController {
   }
 
   @Get()
+  @UseGuards(AuthGuard("jwt"))
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: "Returns all meetups" })
   @ApiResponse({ status: HttpStatus.OK, description: "Success" })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
   getAllAction(): Promise<Meetup[]> {
     return this.meetupService.readAll();
   }
@@ -27,6 +31,7 @@ export class MeetupController {
   @ApiOperation({ summary: "Returns a meetup with specified id" })
   @ApiResponse({ status: HttpStatus.OK, description: "Success", type: Meetup })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Not Found" })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
   async getOneAction(@Param('id') id: number): Promise<Meetup> {
     const meetup = await this.meetupService.readById(id);
     if( meetup === null ){
@@ -41,6 +46,7 @@ export class MeetupController {
   @ApiResponse({ status: HttpStatus.OK, description: "Success", type: Meetup })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Bad Request" })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Not Found" })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
   async createAction(@Body() meetup: CreateMeetupDto): Promise<Meetup>{
     let set = new Set();
     for(let tag of meetup.tags) {
@@ -63,6 +69,7 @@ export class MeetupController {
   @ApiResponse({ status: HttpStatus.OK, description: "Success", type: Meetup })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Not Found" })
   @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: "Bad Request" })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
   async updateAction(
     @Param('id') id: number, 
     @Body() meetup: UpdateMeetupDto
@@ -91,6 +98,7 @@ export class MeetupController {
   @ApiOperation({ summary: "Deletes a meetup with specified id" })
   @ApiResponse({ status: HttpStatus.OK, description: "Success" })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: "Not Found" })
+  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
   async deleteAction(@Param('id') id: number): Promise<void>{
     const existingMeetup = await this.meetupService.readById(id);
     if(existingMeetup === null){
