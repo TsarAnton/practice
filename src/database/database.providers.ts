@@ -11,11 +11,11 @@ export const databaseProviders = [
     useFactory: async () => {
       const sequelize = new Sequelize({
         dialect: 'postgres',
-        host: 'localhost',
-        port: 5432,
-        username: 'postgres',
-        password: '2003',
-        database: 'practice_db',
+        host: process.env.POSTGRES_DB_HOST || 'localhost',
+        port: Number.parseInt(process.env.POSTGRES_DB_PORT || '5432', 10),
+        username: process.env.POSTGRES_DB_USERNAME || 'postgres',
+        password: process.env.POSTGRES_DB_PASSWORD || 'root',
+        database: process.env.POSTGRES_DB_NAME || 'database',
       });
       sequelize.addModels([Meetup, Tag, User, Role]);
       await sequelize.sync();

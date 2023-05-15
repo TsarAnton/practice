@@ -2,10 +2,11 @@ import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, Bad
 import { Meetup } from '../entities/meetup.entity';
 import { MeetupService } from '../services/meetup.service';
 import { CreateMeetupDto, UpdateMeetupDto } from '../dto/meetup.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TagService } from '../services/tag.service';
 import { AuthGuard } from '@nestjs/passport';
 
+@ApiBearerAuth()
 @ApiTags('Meetups')
 @UseGuards(AuthGuard("jwt"))
 @Controller('meetups')

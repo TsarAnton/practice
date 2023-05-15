@@ -2,10 +2,11 @@ import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, Htt
 import { Tag } from '../entities/tag.entity';
 import { TagService } from '../services/tag.service';
 import { CreateTagDto, UpdateTagDto } from '../dto/tag.dto';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
-//@UseGuards(AuthGuard("jwt"))
+@ApiBearerAuth()
+@UseGuards(AuthGuard("jwt"))
 @ApiTags('Tags')
 @Controller('tags')
 export class TagController {

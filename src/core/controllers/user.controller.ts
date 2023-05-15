@@ -2,12 +2,13 @@ import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, Bad
 import { User } from '../entities/user.entity';
 import { UserService } from '../services/user.service';
 import { CreateUserDto, UpdateUserDto } from '../dto/user.dto';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RoleService } from '../services/role.service';
 import { AuthGuard } from '@nestjs/passport';
 import { HasRoles } from '../auth/decorators/has-role.decorator';
 import { RolesGuard } from '../auth/services/roles.guard';
 
+@ApiBearerAuth()
 @HasRoles("admin")
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard("jwt"))
