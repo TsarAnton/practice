@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, HttpStatus, HttpCode, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, HttpStatus, HttpCode, UseGuards, Query } from '@nestjs/common';
 import { Tag } from '../entities/tag.entity';
 import { TagService } from '../services/tag.service';
-import { CreateTagDto, UpdateTagDto } from '../dto/tag.dto';
+import { CreateTagDto, UpdateTagDto, ReadTagDto } from '../dto/tag.dto';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
@@ -18,8 +18,13 @@ export class TagController {
   @ApiOperation({ summary: "Returns all tags" })
   @ApiResponse({ status: HttpStatus.OK, description: "Success" })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
-  getAllAction(): Promise<Tag[]> {
-    return this.TagService.readAll();
+  getAllAction(@Body() tagOptions: ReadTagDto): Promise<Tag[]> {
+    const { pagination, sorting, ...filter } = tagOptions;
+    return this.TagService.readAllBy({
+      pagination,
+      sorting,
+      filter,
+    });
   }
 
   @Get(':id')

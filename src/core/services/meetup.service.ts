@@ -5,6 +5,11 @@ import { UpdateMeetupDto } from '../dto/meetup.dto';
 import { Tag } from '../entities/tag.entity';
 import { TagService } from './tag.service';
 
+import { defaultPagination } from '../types/constants/pagination.constants';
+import { defaultSorting } from '../types/constants/sorting.constants';
+
+import { IMeetupOptions } from '../types/meetup-options';
+
 @Injectable()
 export class MeetupService {
   constructor(
@@ -24,11 +29,23 @@ export class MeetupService {
     });
   }
 
-  // public async readBy(options: ReadMeetupDto): Promise<Meetup> {
-  //   return await this.meetupRepository.findOne({
-  //     where: { ...options },
-  //   });
-  // }
+  public async readAllBy(
+    options: IMeetupOptions,
+  ): Promise<Meetup[]> {
+    const pagination = options.pagination === undefined ? defaultPagination : options.pagination;
+    const sorting = options.sorting === undefined ? defaultSorting : options.sorting;
+
+    return await this.meetupRepository.findAll({
+      where: options.filter,
+      include: {
+        model: Tag, 
+        all: true, 
+      },
+      limit: pagination.size,
+      offset: pagination.offset,
+      order: [[sorting.column, sorting.direction]],
+    });
+  }
 
   public async readById(id: number): Promise<Meetup> {
     return await this.meetupRepository.findOne({

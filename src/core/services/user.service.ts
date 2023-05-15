@@ -6,6 +6,11 @@ import { ReadUserDto } from '../dto/user.dto';
 import { Role } from '../entities/role.entity';
 import { RoleService } from './role.service';
 
+import { defaultPagination } from '../types/constants/pagination.constants';
+import { defaultSorting } from '../types/constants/sorting.constants';
+
+import { IUserOptions } from '../types/user-options';
+
 @Injectable()
 export class UserService {
   constructor(
@@ -22,6 +27,24 @@ export class UserService {
           all: true,
         }
       ]
+    });
+  }
+  
+  public async readAllBy(
+    options: IUserOptions,
+  ): Promise<User[]> {
+    const pagination = options.pagination === undefined ? defaultPagination : options.pagination;
+    const sorting = options.sorting === undefined ? defaultSorting : options.sorting;
+
+    return await this.userRepository.findAll({
+      where: options.filter,
+      include: {
+        model: Role, 
+        all: true, 
+      },
+      limit: pagination.size,
+      offset: pagination.offset,
+      order: [[sorting.column, sorting.direction]],
     });
   }
 

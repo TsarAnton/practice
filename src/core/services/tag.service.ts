@@ -3,6 +3,11 @@ import { Tag } from '../entities/tag.entity';
 import { CreateTagDto } from '../dto/tag.dto';
 import { UpdateTagDto } from '../dto/tag.dto';
 
+import { defaultPagination } from '../types/constants/pagination.constants';
+import { defaultSorting } from '../types/constants/sorting.constants';
+
+import { ITagOptions } from '../types/tag-options';
+
 @Injectable()
 export class TagService {
   constructor(
@@ -12,6 +17,20 @@ export class TagService {
 
   public async readAll(): Promise<Tag[]> {
     return await this.tagRepository.findAll();
+  }
+
+  public async readAllBy(
+    options: ITagOptions,
+  ): Promise<Tag[]> {
+    const pagination = options.pagination === undefined ? defaultPagination : options.pagination;
+    const sorting = options.sorting === undefined ? defaultSorting : options.sorting;
+
+    return await this.tagRepository.findAll({
+      where: options.filter,
+      limit: pagination.size,
+      offset: pagination.offset,
+      order: [[sorting.column, sorting.direction]],
+    });
   }
 
   public async readById(id: number): Promise<Tag> {

@@ -8,22 +8,27 @@ import {
 	IsString,
 	MaxLength,
     IsOptional,
+	IsObject,
+	ValidateNested,
 } from 'class-validator';
+import { Type } from 'class-transformer';
+import { SortingDto } from './common/sorting.dto';
+import { PaginationDto } from './common/pagination.dto';
 
 export class CreateUserDto {
-	@ApiProperty({ description: "User login", nullable: false })
+	@ApiProperty({ description: "User login", required: true })
     @IsNotEmpty()
 	@MaxLength(100)
 	@IsString()
     login: string;
 
-	@ApiProperty({ description: "User password", nullable: false })
+	@ApiProperty({ description: "User password", required: true })
     @IsNotEmpty()
 	@MaxLength(255)
 	@IsString()
     password: string;
 
-	@ApiProperty({ description: "User roles", nullable: false })
+	@ApiProperty({ description: "User roles", required: true })
 	@IsNotEmpty()
     @IsDefined()
 	@IsArray()
@@ -32,19 +37,19 @@ export class CreateUserDto {
 }
 
 export class UpdateUserDto {
-	@ApiProperty({ description: "User login", nullable: true })
+	@ApiProperty({ description: "User login", required: false })
     @IsOptional()
 	@MaxLength(100)
 	@IsString()
     login?: string;
 
-	@ApiProperty({ description: "User password", nullable: true })
+	@ApiProperty({ description: "User password", required: false })
     @IsOptional()
 	@MaxLength(100)
 	@IsString()
     password?: string;
 
-	@ApiProperty({ description: "User roles", nullable: true })
+	@ApiProperty({ description: "User roles", required: false })
     @IsOptional()
 	@IsDefined()
 	@IsArray()
@@ -53,13 +58,27 @@ export class UpdateUserDto {
 }
 
 export class ReadUserDto {
-	@ApiProperty({ description: "User login", nullable: true })
+	@ApiProperty({ description: "Pagination", required: false })
+	@IsOptional()
+	@IsObject()
+	@ValidateNested()
+	@Type(() => PaginationDto)
+	public pagination?: PaginationDto;
+
+	@ApiProperty({ description: "Sorting", required: false })
+	@IsOptional()
+	@IsObject()
+	@ValidateNested()
+	@Type(() => SortingDto)
+	public sorting?: SortingDto;
+
+	@ApiProperty({ description: "User login", required: false })
     @IsOptional()
 	@MaxLength(100)
 	@IsString()
     login?: string;
 
-	@ApiProperty({ description: "User password", nullable: true })
+	@ApiProperty({ description: "User password", required: false })
     @IsOptional()
 	@MaxLength(100)
 	@IsString()

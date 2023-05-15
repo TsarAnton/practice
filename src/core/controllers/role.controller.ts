@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, HttpStatus, HttpCode, BadRequestException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, HttpStatus, HttpCode, BadRequestException, UseGuards, Query } from '@nestjs/common';
 import { Role } from '../entities/role.entity';
 import { RoleService } from '../services/role.service';
-import { CreateRoleDto, UpdateRoleDto } from '../dto/role.dto';
+import { CreateRoleDto, UpdateRoleDto, ReadRoleDto } from '../dto/role.dto';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { HasRoles } from '../auth/decorators/has-role.decorator';
@@ -23,8 +23,13 @@ export class RoleController {
   @ApiResponse({ status: HttpStatus.OK, description: "Success" })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: "Forbidden" })
-  getAllAction(): Promise<Role[]> {
-    return this.RoleService.readAll();
+  getAllAction(@Body() roleOptions: ReadRoleDto): Promise<Role[]> {
+    const { pagination, sorting, ...filter } = roleOptions;
+    return this.RoleService.readAllBy({
+      pagination,
+      sorting,
+      filter,
+    });
   }
 
   @Get(':id')

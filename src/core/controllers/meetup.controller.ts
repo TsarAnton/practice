@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, BadRequestException, HttpStatus, HttpCode, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, BadRequestException, HttpStatus, HttpCode, UseGuards, Query } from '@nestjs/common';
 import { Meetup } from '../entities/meetup.entity';
 import { MeetupService } from '../services/meetup.service';
-import { CreateMeetupDto, UpdateMeetupDto } from '../dto/meetup.dto';
+import { CreateMeetupDto, UpdateMeetupDto, ReadMeetupDto } from '../dto/meetup.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { TagService } from '../services/tag.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -18,13 +18,17 @@ export class MeetupController {
   }
 
   @Get()
-  @UseGuards(AuthGuard("jwt"))
   @HttpCode(HttpStatus.OK)
   @ApiOperation({ summary: "Returns all meetups" })
   @ApiResponse({ status: HttpStatus.OK, description: "Success" })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
-  getAllAction(): Promise<Meetup[]> {
-    return this.meetupService.readAll();
+  getAllAction(@Body() meetupOptions: ReadMeetupDto): Promise<Meetup[]> {
+    const { pagination, sorting, ...filter } = meetupOptions;
+    return this.meetupService.readAllBy({
+      pagination,
+      sorting,
+      filter,
+    });
   }
 
   @Get(':id')

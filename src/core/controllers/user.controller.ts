@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, BadRequestException, HttpStatus, HttpCode, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Body, Put, NotFoundException, BadRequestException, HttpStatus, HttpCode, UseGuards, Query } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { UserService } from '../services/user.service';
-import { CreateUserDto, UpdateUserDto } from '../dto/user.dto';
+import { CreateUserDto, UpdateUserDto, ReadUserDto } from '../dto/user.dto';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { RoleService } from '../services/role.service';
 import { AuthGuard } from '@nestjs/passport';
@@ -27,8 +27,13 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.OK, description: "Success" })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: "Forbidden" })
-  getAllAction(): Promise<User[]> {
-    return this.userService.readAll();
+  getAllAction(@Body() userOptions: ReadUserDto): Promise<User[]> {
+    const { pagination, sorting, ...filter } = userOptions;
+    return this.userService.readAllBy({
+      pagination,
+      sorting,
+      filter,
+    });
   }
 
   @Get(':id')
