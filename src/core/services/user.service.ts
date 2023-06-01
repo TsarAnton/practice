@@ -1,22 +1,28 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, Scope } from '@nestjs/common';
 import { User } from '../entities/user.entity';
 import { CreateUserDto } from '../dto/user.dto';
 import { UpdateUserDto } from '../dto/user.dto';
 import { ReadUserDto } from '../dto/user.dto';
 import { Role } from '../entities/role.entity';
 import { RoleService } from './role.service';
+import { JwtService } from '@nestjs/jwt';
+import { Request } from 'express';
+import { REQUEST } from '@nestjs/core';
 
 import { defaultPagination } from '../types/constants/pagination.constants';
 import { defaultSorting } from '../types/constants/sorting.constants';
 
 import { IUserOptions } from '../types/user-options';
 
-@Injectable()
+@Injectable({ scope: Scope.REQUEST })
 export class UserService {
   constructor(
     @Inject("USERS_REPOSITORY")
     private userRepository: typeof User,
     private roleService: RoleService,
+    @Inject(REQUEST)
+    private readonly request: Request,
+    private jwtService: JwtService,
   ) {}
 
   public async readAll(): Promise<User[]> {
@@ -91,18 +97,16 @@ export class UserService {
     user: UpdateUserDto
   ): Promise<User> {
     let existingUser = await this.readById(id);
-    let update = {
-      login: user.login !== undefined ? user.login : existingUser.login,
-      password: user.password !== undefined ? user.password : existingUser.password,
+    for(let prop in user) {
+      existingUser[prop] = user[prop];
     }
 		let createdUser = [... await this.userRepository.update(
-      update,
+      existingUser,
       {
         where: { id },
         returning: true,
       }
     )][1][0];
-    console.log(user.roles)
     if(user.roles !== undefined) {
 		  for await (const role of user.roles) {
 			  await createdUser.$add('roles', await this.roleService.readById(role));
@@ -114,9 +118,19 @@ export class UserService {
 
   public async delete(id: number): Promise<void> {
     let existingUser = await this.readById(id);
-    existingUser.$remove('roles', existingUser.dataValues.roles)
+    existingUser.$remove('roles', existingUser.dataValues.roles);
+    existingUser.$remove('meetups', existingUser.dataValues.meetups);
     await this.userRepository.destroy({
       where: { id },
     });
+  }
+
+  public async getRegisteredUser(): Promise<User> {
+    const [type, token] = this.request.headers.authorization?.split(' ') ?? [];
+    if(type !== 'Bearer') {
+      return undefined;
+    }
+    const user = Object(this.jwtService.decode(token));
+    return await this.readById(user.id);
   }
 }

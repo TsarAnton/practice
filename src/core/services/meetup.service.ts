@@ -4,6 +4,7 @@ import { CreateMeetupDto } from '../dto/meetup.dto';
 import { UpdateMeetupDto } from '../dto/meetup.dto';
 import { Tag } from '../entities/tag.entity';
 import { TagService } from './tag.service';
+import { UserService } from './user.service';
 
 import { defaultPagination } from '../types/constants/pagination.constants';
 import { defaultSorting } from '../types/constants/sorting.constants';
@@ -16,6 +17,7 @@ export class MeetupService {
     @Inject("MEETUPS_REPOSITORY")
     private meetupRepository: typeof Meetup,
     private tagService: TagService,
+    private userService: UserService,
   ) {}
 
   public async readAll(): Promise<Meetup[]> {
@@ -59,12 +61,17 @@ export class MeetupService {
     });
   }
 
-  public async create(meetup: CreateMeetupDto): Promise<Meetup> {
+  public async create(meetup: CreateMeetupDto, userId: number): Promise<Meetup> {
     let newMeetup = new Meetup();
     for(let prop in meetup) {
       newMeetup[prop] = meetup[prop];
     }
+
 		let createdMeetup = await this.meetupRepository.create(newMeetup.dataValues);
+
+    const registeredUser = await this.userService.readById(userId);
+
+    await createdMeetup.$set('creator', registeredUser);
 
 		for await (const tag of meetup.tags) {
 			await createdMeetup.$add('tags', await this.tagService.readById(tag));
@@ -73,24 +80,27 @@ export class MeetupService {
 		return await this.readById(createdMeetup.id);
   }
 
+  public async addMember(meetupId: number, userId: number): Promise<Meetup> {
+    let existingMeetup = await this.readById(meetupId);
+    await existingMeetup.$add('members', await this.userService.readById(userId));
+    return await this.readById(existingMeetup.id);
+  }
+
   public async update(
     id: number,
     meetup: UpdateMeetupDto
   ): Promise<Meetup> {
     let existingMeetup = await this.readById(id);
-    let update = {
-      desciption: meetup.description !== undefined ? meetup.description : existingMeetup.description,
-      place: meetup.place !== undefined ? meetup.place : existingMeetup.place,
-      time: meetup.time !== undefined ? meetup.time : existingMeetup.time,
+    for(let prop in meetup) {
+      existingMeetup[prop] = meetup[prop];
     }
 		let createdMeetup = [... await this.meetupRepository.update(
-      update,
+      existingMeetup,
       {
         where: { id },
         returning: true,
       }
     )][1][0];
-    console.log(meetup.tags)
     if(meetup.tags !== undefined) {
 		  for await (const tag of meetup.tags) {
 			  await createdMeetup.$add('tags', await this.tagService.readById(tag));
@@ -102,7 +112,8 @@ export class MeetupService {
 
   public async delete(id: number): Promise<void> {
     let existingMeetup = await this.readById(id);
-    existingMeetup.$remove('tags', existingMeetup.dataValues.tags)
+    existingMeetup.$remove('tags', existingMeetup.dataValues.tags);
+    existingMeetup.$remove('members', existingMeetup.dataValues.members);
     await this.meetupRepository.destroy({
       where: { id },
     });

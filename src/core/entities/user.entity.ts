@@ -4,9 +4,11 @@ import {
 	BelongsToMany,
 	DataType,
 	Model,
+	HasMany,
 } from 'sequelize-typescript';
 import { Role } from './role.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Meetup } from './meetup.entity';
 
 @Table({ tableName: 'users', paranoid: true })
 export class User extends Model<User> {
@@ -41,4 +43,15 @@ export class User extends Model<User> {
 		"role_id",
 	)
 	roles: Role[];
+
+	@BelongsToMany(
+		() => Meetup, 
+		'meetups_to_users', 
+		'user_id', 
+		'meetup_id'
+	)
+	signUpMeetups: Meetup[];
+
+	@HasMany(() => Meetup, 'creator_id')
+	meetups: Meetup[];
 }

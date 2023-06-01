@@ -12,7 +12,6 @@ export class RolesGuard implements CanActivate {
 
   private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    console.log(request.headers)
     return type === 'Bearer' ? token : undefined;
   }
 
@@ -26,7 +25,6 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    console.log(request);
     const token = this.extractTokenFromHeader(request);
     const user = Object(this.jwtService.decode(token));
 

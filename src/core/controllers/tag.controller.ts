@@ -18,7 +18,7 @@ export class TagController {
   @ApiOperation({ summary: "Returns all tags" })
   @ApiResponse({ status: HttpStatus.OK, description: "Success" })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
-  getAllAction(@Body() tagOptions: ReadTagDto): Promise<Tag[]> {
+  getAllAction(@Query() tagOptions: ReadTagDto): Promise<Tag[]> {
     const { pagination, sorting, ...filter } = tagOptions;
     return this.TagService.readAllBy({
       pagination,

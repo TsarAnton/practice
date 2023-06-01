@@ -23,7 +23,7 @@ export class RoleController {
   @ApiResponse({ status: HttpStatus.OK, description: "Success" })
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: "Forbidden" })
-  getAllAction(@Body() roleOptions: ReadRoleDto): Promise<Role[]> {
+  getAllAction(@Query() roleOptions: ReadRoleDto): Promise<Role[]> {
     const { pagination, sorting, ...filter } = roleOptions;
     return this.RoleService.readAllBy({
       pagination,
@@ -56,8 +56,8 @@ export class RoleController {
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: "Forbidden" })
   async createAction(@Body() role: CreateRoleDto): Promise<Role>{
     const roles = await this.RoleService.readAll();
-    for(let role of roles) {
-      if(role.dataValues.name === role.name) {
+    for(let existingRole of roles) {
+      if(existingRole.dataValues.name === role.name) {
         throw new BadRequestException(`Role ${role.name} already exist`);
       }
     }

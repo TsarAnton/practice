@@ -20,6 +20,7 @@ export class AuthService {
     }
     if (user && user.password === password) {
       const result = {
+        id: user.id,
         login: user.login,
         roles: roles,
       }
@@ -30,6 +31,7 @@ export class AuthService {
 
   async login(user: any) {
     const payload = {
+        id: user.id,
         login: user.login,
         roles: user.roles,
     };

@@ -4,9 +4,11 @@ import {
 	BelongsToMany,
 	DataType,
 	Model,
+	BelongsTo,
 } from 'sequelize-typescript';
 import { Tag } from './tag.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from './user.entity';
 
 @Table({ tableName: 'meetups', paranoid: true })
 export class Meetup extends Model<Meetup> {
@@ -55,4 +57,17 @@ export class Meetup extends Model<Meetup> {
 		"tag_id",
 	)
 	tags: Tag[];
+
+	@ApiProperty({ description: "Meetup creator", nullable: false })
+	@BelongsTo(() => User, 'creator_id')
+	creator: User;
+
+	@ApiProperty({ description: "Meetup members", nullable: false })
+	@BelongsToMany(
+		() => User,
+		'meetups_to_users', 
+		'meetup_id', 
+		'user_id'
+	)
+	members: User[];
 }
