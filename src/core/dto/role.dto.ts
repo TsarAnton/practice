@@ -11,23 +11,23 @@ import { Type } from 'class-transformer';
 import { SortingDto } from './common/sorting.dto';
 import { PaginationDto } from './common/pagination.dto';
 
-export class CreateTagDto {
-	@ApiProperty({ description: "Tag name", required: true })
+export class CreateRoleDto {
+	@ApiProperty({ description: "Role name", required: true })
     @IsNotEmpty()
 	@MaxLength(100)
 	@IsString()
     name: string;
 }
 
-export class UpdateTagDto {
-	@ApiProperty({ description: "Tag name", required: false })
+export class UpdateRoleDto {
+	@ApiProperty({ description: "Role name", required: false })
     @IsOptional()
 	@MaxLength(100)
 	@IsString()
     name?: string;
 }
 
-export class ReadTagDto {
+export class ReadRoleDto {
 	@ApiProperty({ description: "Pagination", required: false })
 	@IsOptional()
 	@IsObject()
@@ -42,7 +42,7 @@ export class ReadTagDto {
 	@Type(() => SortingDto)
 	public sorting?: SortingDto;
 
-	@ApiProperty({ description: "Tag name", required: false })
+	@ApiProperty({ description: "Role name", required: false })
     @IsOptional()
 	@MaxLength(100)
 	@IsString()
