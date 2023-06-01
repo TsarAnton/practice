@@ -60,6 +60,10 @@ export class UserController {
   @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: "Unauthorized" })
   @ApiResponse({ status: HttpStatus.FORBIDDEN, description: "Forbidden" })
   async createAction(@Body() user: CreateUserDto): Promise<User>{
+    const existingUser = await this.userService.readBy({ login: user.login });
+    if(existingUser !== null) {
+      throw new BadRequestException(`USer with login=${user.login} already exist`);
+    }
     let set = new Set();
     for(let role of user.roles) {
       if(set.has(role)) {
