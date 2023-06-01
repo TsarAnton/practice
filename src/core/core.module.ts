@@ -31,7 +31,7 @@ import { usersProviders } from './providers/users.providers';
 	],
 	providers: [
 		MeetupService,
-    	TagService,
+    TagService,
 		RoleService,
 		UserService,
 		...meetupsProviders,
@@ -41,7 +41,7 @@ import { usersProviders } from './providers/users.providers';
 	],
 	exports: [
 		MeetupService,
-    	TagService,
+    TagService,
 		RoleService,
 		UserService,
 	],

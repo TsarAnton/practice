@@ -17,68 +17,68 @@ import { PaginationDto } from './common/pagination.dto';
 
 export class CreateMeetupDto {
 	@ApiProperty({ description: "Meetup name", required: true })
-    @IsNotEmpty()
+  @IsNotEmpty()
 	@MaxLength(100)
 	@IsString()
-    name: string;
+  name: string;
 
 	@ApiProperty({ description: "Meetup description", required: true })
-    @IsNotEmpty()
+  @IsNotEmpty()
 	@MaxLength(255)
 	@IsString()
-    description: string;
+  description: string;
 
 	@ApiProperty({ description: "Meetup start time", required: true })
 	@IsNotEmpty()
-    @IsDefined()
+  @IsDefined()
 	@IsDate()
 	@Transform(({ value }) => new Date(value))
-    time: Date;
+  time: Date;
 
 	@ApiProperty({ description: "Meetup place", required: true })
-    @IsNotEmpty()
+  @IsNotEmpty()
 	@MaxLength(100)
 	@IsString()
-    place: string;
+  place: string;
 
 	@ApiProperty({ description: "Meetup tags", required: true })
-    @IsDefined()
+  @IsDefined()
 	@IsArray()
 	@IsInt({ each: true })
-    tags: number[];
+  tags: number[];
 }
 
 export class UpdateMeetupDto {
 	@ApiProperty({ description: "Meetup name", required: false })
-    @IsOptional()
+  @IsOptional()
 	@MaxLength(100)
 	@IsString()
-    name?: string;
+  name?: string;
 
 	@ApiProperty({ description: "Meetup description", required: false })
-    @IsOptional()
+  @IsOptional()
 	@MaxLength(100)
 	@IsString()
-    description?: string;
+  description?: string;
 
-    @ApiProperty({ description: "Meetup start time", required: false })
-    @IsOptional()
+  @ApiProperty({ description: "Meetup start time", required: false })
+  @IsOptional()
 	@IsDefined()
 	@IsDate()
 	@Transform(({ value }) => new Date(value))
-    time?: Date;
+  time?: Date;
 
-    @ApiProperty({ description: "Meetup place", required: false })
-    @IsOptional()
+  @ApiProperty({ description: "Meetup place", required: false })
+  @IsOptional()
 	@MaxLength(100)
 	@IsString()
-    place?: string;
+  place?: string;
 
-    @ApiProperty({ description: "Meetup tags", required: false })
-    @IsOptional()
+  @ApiProperty({ description: "Meetup tags", required: false })
+  @IsOptional()
 	@IsArray()
 	@IsInt({ each: true })
-    tags?: number[];
+  tags?: number[];
 }
 
 export class ReadMeetupDto {
@@ -97,33 +97,33 @@ export class ReadMeetupDto {
 	public sorting?: SortingDto;
 
 	@ApiProperty({ description: "Meetup name", required: false })
-    @IsOptional()
+  @IsOptional()
 	@MaxLength(100)
 	@IsString()
-    name?: string;
+  name?: string;
 
 	@ApiProperty({ description: "Meetup description", required: false })
-    @IsOptional()
+  @IsOptional()
 	@MaxLength(100)
 	@IsString()
-    description?: string;
+  description?: string;
 
-    @ApiProperty({ description: "Meetup start time", required: false })
-    @IsOptional()
+  @ApiProperty({ description: "Meetup start time", required: false })
+  @IsOptional()
 	@IsDefined()
 	@IsDate()
 	@Transform(({ value }) => new Date(value))
-    time?: Date;
+  time?: Date;
 
-    @ApiProperty({ description: "Meetup place", required: false })
-    @IsOptional()
+  @ApiProperty({ description: "Meetup place", required: false })
+  @IsOptional()
 	@MaxLength(100)
 	@IsString()
-    place?: string;
+  place?: string;
 
-    @ApiProperty({ description: "Meetup tags", required: false })
-    @IsOptional()
+  @ApiProperty({ description: "Meetup tags", required: false })
+  @IsOptional()
 	@IsArray()
 	@IsInt({ each: true })
-    tags?: number[];
+  tags?: number[];
 }
