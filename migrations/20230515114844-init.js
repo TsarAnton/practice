@@ -222,7 +222,7 @@ module.exports = {
       },
      });
 
-     await queryInterface.createTable('users_to_meetups', { 
+     await queryInterface.createTable('meetups_to_users', { 
       id: {
         type: Sequelize.DataTypes.INTEGER,
         autoIncrement: true,
@@ -287,7 +287,7 @@ module.exports = {
   async down (queryInterface, Sequelize) {
     await queryInterface.dropTable('users_to_roles');
     await queryInterface.dropTable('meetups_to_tags');
-    await queryInterface.dropTable('users_to_meetups');
+    await queryInterface.dropTable('meetups_to_users');
     await queryInterface.dropTable('users');
     await queryInterface.dropTable('tags');
     await queryInterface.dropTable('meetups');
