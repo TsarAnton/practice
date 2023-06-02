@@ -7,7 +7,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { HasRoles } from '../auth/decorators/has-role.decorator';
 import { RolesGuard } from '../auth/services/roles.guard';
 
-@ApiBearerAuth()
+@ApiBearerAuth("JWT authorization")
 @HasRoles("admin")
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard("jwt"))

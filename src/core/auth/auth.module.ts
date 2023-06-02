@@ -13,8 +13,8 @@ import { CoreModule } from 'src/core/core.module';
     CoreModule,
     JwtModule.register({
       global: true,
-      secret: process.env.ACCESS_TOKEN_SECRET,
-      signOptions: { expiresIn: process.env.ACCESS_TOKEN_EXPIRED },
+      secret: "aaa",//process.env.ACCESS_TOKEN_SECRET,
+      signOptions: { expiresIn: "1h"},//process.env.ACCESS_TOKEN_EXPIRED },
     }),
   ],
   controllers: [AuthController],

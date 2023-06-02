@@ -10,6 +10,7 @@ import { HasRoles } from '../auth/decorators/has-role.decorator';
 import { RolesGuard } from '../auth/services/roles.guard';
 
 @ApiBearerAuth()
+@ApiBearerAuth("JWT authorization")
 @ApiTags('Meetups')
 @UseGuards(AuthGuard("jwt"))
 @Controller('meetups')

@@ -5,7 +5,7 @@ import { CreateTagDto, UpdateTagDto, ReadTagDto } from '../dto/tag.dto';
 import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 
-@ApiBearerAuth()
+@ApiBearerAuth("JWT authorization")
 @UseGuards(AuthGuard("jwt"))
 @ApiTags('Tags')
 @Controller('tags')

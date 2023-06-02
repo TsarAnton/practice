@@ -8,7 +8,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { HasRoles } from '../auth/decorators/has-role.decorator';
 import { RolesGuard } from '../auth/services/roles.guard';
 
-@ApiBearerAuth()
+@ApiBearerAuth("JWT authorization")
 @HasRoles("admin")
 @UseGuards(RolesGuard)
 @UseGuards(AuthGuard("jwt"))
@@ -62,7 +62,7 @@ export class UserController {
   async createAction(@Body() user: CreateUserDto): Promise<User>{
     const existingUser = await this.userService.readBy({ login: user.login });
     if(existingUser !== null) {
-      throw new BadRequestException(`USer with login=${user.login} already exist`);
+      throw new BadRequestException(`User with login=${user.login} already exist`);
     }
     let set = new Set();
     for(let role of user.roles) {
